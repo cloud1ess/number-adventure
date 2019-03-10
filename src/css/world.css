@@ -1,0 +1,44 @@
+.world__selection_info {
+    display:block;
+}
+.world__selection_info--gold_icon {
+    background-image: url("img/hud/coin.png");
+}
+
+.selection-info__title{
+    margin: 0;
+}
+
+.world__selection_info--label {
+    display: block;
+}
+
+.world__selection_info--tab {
+    display: block;
+    margin-bottom: 4px;
+    margin-left: 0px;
+    width: 100%;
+    text-align: right;
+
+    border-image-width: 10px 0px 10px 10px !important;
+}
+
+.world__selection_info--tab.active{
+    display: block;
+    margin-left: 9px;
+}
+
+.world__selection_info--tab_container {
+    position: absolute;
+    right: 100%;
+    width:130px;
+}
+
+.world__selection_info--tab_content {
+    width:260px;
+    padding: 2px;
+}
+
+.world__selection_info--building_button {
+    display: block;
+}

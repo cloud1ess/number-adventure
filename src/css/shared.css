@@ -1,0 +1,86 @@
+.hidden {
+    display:none
+}
+
+.no_margin {
+    margin: 0;
+}
+
+.center_text {
+    text-align: center;
+}
+
+.game_canvas {
+    position: absolute;
+    top:0;
+    left:0;
+}
+
+.game_container {
+    position: absolute;
+    width: 1000px;
+    height: 700px;
+}
+
+
+.parchment {
+    border-image: url(img/hud/Button.png) 10 10 10 10 repeat;
+    border-width: 10px;
+    border-image-width: 10px;
+    background-image: url("img/hud/parchment.png");
+}
+
+/*-- Buttons --*/
+
+.button {
+    border-image: url(img/hud/Button.png) 10 10 10 10 repeat;
+    border-width: 10px 10px 10px 10px;
+    border-image-width: 10px 10px 10px 10px;
+    background-image: url("img/hud/parchment.png");
+}
+
+.button:focus {
+    outline:0;
+}
+.button:hover {
+    border-image: url(img/hud/ButtonHighlighted.png) 10 10 10 10 repeat;
+    border-width: 10px 10px 10px 10px;
+    border-image-width: 10px 10px 10px 10px;
+}
+
+.icon_button--medium  {
+    width:50px;
+    height:50px;
+}
+
+.icon_button--small  {
+    width:34px;
+    height:34px;
+}
+
+.label_button--medium  {
+    width:160px;
+    height:48px;
+}
+
+/*-- Labels --*/
+
+.label--big, h1{
+    font: 55px Trajan Pro;
+    user-select: none;
+}
+
+.label--medium, h2{
+    font: 25px Trajan Pro;
+    user-select: none;
+}
+
+.label--small, h3{
+    font: 13px Trajan Pro;
+    user-select: none;
+}
+
+.label--tiny, p{
+    font: 12px Trajan Pro;
+    user-select: none;
+}
