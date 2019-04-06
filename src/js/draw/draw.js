@@ -2,7 +2,7 @@ import Utils from '../../../libs/Utils.js'
 import Panel from '../../../libs/Panel.js'
 import { VIEWS } from '../logic.js'
 import DrawSetup from './draw_setup.js'
-import DrawGame from './draw_game.js'
+import {init as initGame, draw as drawGame} from './draw_game.js'
 
 let setInteractive = () => {}
 
@@ -13,22 +13,19 @@ const canvasSize = {
 
 const game = Utils.createElement('div', null, ['game_container'])
 const canvas = Utils.createElement('canvas', game, [], canvasSize)
-const panel = Panel(canvas);
+let panel = Panel(canvas);
 
 const drawView = {
-  [VIEWS.SETUP]: DrawSetup,
-  [VIEWS.GAME]: DrawGame
+  [VIEWS.GAME]: drawGame
 }
 
-const clearCanvas = (clearPanels) => {
-  if (clearPanels) panel.clear()
-  panel.drawRect({
-    x: 0,
-    y: 0,
-    wid: canvasSize.width,
-    hei: canvasSize.height,
-    colour: 'rgb(51, 178, 77)'
-  });
+const initView = {
+  [VIEWS.GAME]: initGame
+}
+
+const initDrawView = (state) => {
+  initView[state.view](state, panel, setInteractive)
+  renderedView = state.view
 }
 
 let renderedView
@@ -39,10 +36,12 @@ export const registerInteractionHooks = (setInteractiveHook) => {
 
 export const drawHook = (state) => {
   if (drawView[state.view]) {
-    clearCanvas(renderedView === state.view)
+    if (renderedView !== state.view) {
+      initDrawView(state)
+    }
+    panel.clear()
     drawView[state.view](state, panel)
     panel.render()
-    renderedView = state.view
   } else {
     console.log(`No Draw function for view: ${state.view}`)
   }

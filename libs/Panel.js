@@ -1,7 +1,7 @@
 import CanvasRender from './CanvasRender.js'
 import MathUtils from './MathUtils.js'
 
-export default function (canvasElement, hitBox = {}) {
+export default function (canvasElement, hitBox) {
 	let pos = {x: 0, y: 0};
 	let realPos = {x: 0, y: 0};
 	let parentPos = {x: 0, y: 0};
@@ -25,6 +25,7 @@ export default function (canvasElement, hitBox = {}) {
 
 	function addChild (panel) {
 		children.push(panel);
+		panel.updateRealPos(pos)
 	}
 
 	function removeChild (panel) {
@@ -76,8 +77,8 @@ export default function (canvasElement, hitBox = {}) {
 			children[i].sinkMouseEvent(evt);
 			i--;
 		}
-		if (!evt.handled && mouseEnabled[evt.type]) {
-			if (!mouseHitBox || MathUtils.pointInRect(evt.x, evt.y, realPos.x + mouseHitBox.x1, realPos.y + mouseHitBox.y1, realPos.x + mouseHitBox.x2, realPos + mouseHitBox.y2)) {
+		if (!evt.handled && mouseEnabled && mouseEnabled[evt.type]) {
+			if (!mouseHitBox || MathUtils.pointInRect(evt.x, evt.y, realPos.x + mouseHitBox.x1, realPos.y + mouseHitBox.y1, realPos.x + mouseHitBox.x2, realPos.y + mouseHitBox.y2)) {
 				fireEvent(evt);
 			}
 		}
@@ -273,6 +274,7 @@ export default function (canvasElement, hitBox = {}) {
 		drawSprite: drawSprite,
 		drawImageData: drawImageData,
 		playSprite: playSprite,
+		updateRealPos,
 		setPos: setPos,
 		setRotation: setRotation,
 		setHitBox: setHitBox,

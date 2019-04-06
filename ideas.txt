@@ -1,0 +1,21 @@
+- Co-op Game, Need to gather stars (from challenges) to buy parts of a rocket.
+  - Challenges re spread out on a map
+  - Buying rocket bits gives you upgrades
+  - Some terrain needs upgrades to get over
+  - Select duration of game at the start.
+    - Always win, but in different ways.
+  - Challenges are questions
+    - multi choice, more stars for first time. Less for later on.
+  - Each go you roll three dice and get that many moves LRUD
+  - Each Player Selects char at the start, no names
+    - Hamster
+    - Toothless
+    - Unicorn
+    - Rabbit
+    - Guinny Pig
+    - Other chars
+  - Each char could have different bonus
+    - Movement bonus
+    - Star carrying capacity
+    - Go over certain terrain already
+    - Re-roll a dice
