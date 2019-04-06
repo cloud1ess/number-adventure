@@ -1,30 +1,23 @@
 import Utils from '../../libs/Utils.js'
 
-let currentState = {}
-let nextState = {}
-const registeredhooks = []
+let state = {}
+const callbacks = []
 
-const registerHook = (callback) => {
-  registeredhooks.push(callback)
+const registerStateCallback = (callback) => {
+  callbacks.push(callback)
 }
 
-const getCurrentState = () => {
- return Utils.copy(currentState)
+const getState = () => {
+ return Utils.copy(state)
 }
 
-const getNextState = () => {
-  return nextState
-}
-
-const switchToNextState = () => {
-  currentState = nextState
-  //nextState = Utils.copy(currentState)
-  registeredhooks.forEach(hook => hook(currentState))
+const setState = (nextState) => {
+  state = nextState
+  callbacks.forEach(hook => hook(Utils.copy(state)))
 }
 
 export {
-  registerHook,
-  getCurrentState,
-  getNextState,
-  switchToNextState
+  registerStateCallback,
+  getState,
+  setState
 }

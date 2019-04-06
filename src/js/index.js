@@ -1,7 +1,11 @@
-import { registerHook, getNextState, switchToNextState } from './state.js'
-import { drawHook } from './draw/draw.js'
-import { logic } from './logic.js'
+import { registerStateCallback, getState, setState } from './state.js'
+import { registerInteractionCallback, setInteractiveHook } from './interaction.js'
+import { registerStateHooks, runLogicHook, ACTIONS } from './logic.js'
+import { registerInteractionHooks, drawHook } from './draw/draw.js'
 
-registerHook(drawHook)
+registerStateCallback(drawHook) // Draw when state changes
+registerInteractionCallback(runLogicHook) // Run Logic after an interaction
+registerStateHooks(getState, setState) // Allow Logic to get and set state
+registerInteractionHooks(setInteractiveHook) // Allow Draw to create interactive UI element
 
-logic(getNextState, switchToNextState)
+runLogicHook(ACTIONS.INIT)

@@ -1,8 +1,10 @@
 import Utils from '../../../libs/Utils.js'
 import Panel from '../../../libs/Panel.js'
-import {VIEWS} from '../logic.js'
+import { VIEWS } from '../logic.js'
 import DrawSetup from './draw_setup.js'
 import DrawGame from './draw_game.js'
+
+let setInteractive = () => {}
 
 const canvasSize = {
   width: 600,
@@ -26,10 +28,14 @@ const clearCanvas = (clearPanels) => {
     wid: canvasSize.width,
     hei: canvasSize.height,
     colour: 'rgb(51, 178, 77)'
-  });  
+  });
 }
 
 let renderedView
+
+export const registerInteractionHooks = (setInteractiveHook) => {
+  setInteractive = setInteractiveHook
+}
 
 export const drawHook = (state) => {
   if (drawView[state.view]) {

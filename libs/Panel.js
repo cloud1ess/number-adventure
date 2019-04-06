@@ -1,7 +1,7 @@
 import CanvasRender from './CanvasRender.js'
 import MathUtils from './MathUtils.js'
 
-export default function (canvasElement) {
+export default function (canvasElement, hitBox = {}) {
 	let pos = {x: 0, y: 0};
 	let realPos = {x: 0, y: 0};
 	let parentPos = {x: 0, y: 0};
@@ -10,7 +10,7 @@ export default function (canvasElement) {
 	let toDraw = [];
 	let children = [];
 	let eventCallbacks = {};
-	let mouseHitBox;
+	let mouseHitBox = hitBox;
 	let mouseEnabled = {mousedown: false, mouseup: false, mousemove: false, mousewheel: false};
 	let canvas
 	 
@@ -49,13 +49,8 @@ export default function (canvasElement) {
 
 	// ------ Mouse ------
 
-	function enableMouse (box, down, up, move, wheel, out) {
+	function setHitBox (box = mouseHitBox) {
 		mouseHitBox = box;
-		mouseEnabled.mousedown = down;
-		mouseEnabled.mouseup = up;
-		mouseEnabled.mousemove = move;
-		mouseEnabled.mousewheel = wheel;
-		mouseEnabled.mouseout = out;
 	}
 
 	function globalMouseHandle (evt) {
@@ -82,7 +77,7 @@ export default function (canvasElement) {
 			i--;
 		}
 		if (!evt.handled && mouseEnabled[evt.type]) {
-			if (MathUtils.pointInRect(evt.x, evt.y, realPos.x + mouseHitBox.x1, realPos.y + mouseHitBox.y1, realPos.x + mouseHitBox.x2, realPos + mouseHitBox.y2)) {
+			if (!mouseHitBox || MathUtils.pointInRect(evt.x, evt.y, realPos.x + mouseHitBox.x1, realPos.y + mouseHitBox.y1, realPos.x + mouseHitBox.x2, realPos + mouseHitBox.y2)) {
 				fireEvent(evt);
 			}
 		}
@@ -220,7 +215,6 @@ export default function (canvasElement) {
 	// ------ Events ------
 
 	function fireEvent (event) {
-
 		if (eventCallbacks[event.type]) {
 			let i = eventCallbacks[event.type].length - 1;
 
@@ -235,12 +229,15 @@ export default function (canvasElement) {
 		if (!eventCallbacks[type]) {
 			eventCallbacks[type] = [];
 		}
+		mouseEnabled[type] = true
+
 		eventCallbacks[type].push(callback);
 	}
 
 	function tearDown (removeFromParent) {
 		toDraw.length = 0;
 		eventCallbacks = null;
+		mouseEnabled = null
 		canvas = null
 		if (canvasElement) {
 			canvasElement.removeEventListener('mousedown', globalMouseHandle.bind(this), false);
@@ -264,7 +261,6 @@ export default function (canvasElement) {
 		addChild: addChild,
 		removeChild: removeChild,
 		removeAllChildren: removeAllChildren,
-		enableMouse: enableMouse,
 		render: render,
 		clear: clear,
 		drawLine: drawLine,
@@ -279,6 +275,7 @@ export default function (canvasElement) {
 		playSprite: playSprite,
 		setPos: setPos,
 		setRotation: setRotation,
+		setHitBox: setHitBox,
 		fireEvent: fireEvent,
 		sinkMouseEvent: sinkMouseEvent,
 		addEventCallback: addEventCallback,

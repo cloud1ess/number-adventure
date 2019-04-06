@@ -1,20 +1,22 @@
+let getState = () => {}
+let setState = () => {}
+
 export const VIEWS = {
   SETUP: 'setup',
   GAME: 'game'
 }
-export const logic = (getNextState, switchToNextState) => {
-  const nextState = getNextState()
 
-  nextState.view = VIEWS.SETUP
+export const ACTIONS = {
+  INIT: 'init'
+}
 
-  switchToNextState()
+export const registerStateHooks = (getStateHook, setStateHook) => {
+  getState = getStateHook
+  setState = setStateHook
+}
 
-  setInterval(() => {
-    const nextState = getNextState()
-
-    nextState.ticks = nextState.ticks || 0
-    nextState.ticks ++
-
-    switchToNextState()
-  }, 1000)
+export const runLogicHook = (actionId, event, state = getState()) => {
+  state.view = VIEWS.SETUP
+  console.log(actionId)
+  setState(state)
 }
