@@ -18,7 +18,7 @@ const getNextState = () => {
 
 const switchToNextState = () => {
   currentState = nextState
-  nextState = Utils.copy(currentState)
+  //nextState = Utils.copy(currentState)
   registeredhooks.forEach(hook => hook(currentState))
 }
 

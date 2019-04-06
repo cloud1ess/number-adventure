@@ -1,10 +1,20 @@
 export const VIEWS = {
-  START: 'start'
+  SETUP: 'setup',
+  GAME: 'game'
 }
-export default (getNextState, switchToNextState) => {
+export const logic = (getNextState, switchToNextState) => {
   const nextState = getNextState()
 
-  nextState.view = VIEWS.START
+  nextState.view = VIEWS.SETUP
 
   switchToNextState()
+
+  setInterval(() => {
+    const nextState = getNextState()
+
+    nextState.ticks = nextState.ticks || 0
+    nextState.ticks ++
+
+    switchToNextState()
+  }, 1000)
 }

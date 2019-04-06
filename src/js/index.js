@@ -1,7 +1,7 @@
 import { registerHook, getNextState, switchToNextState } from './state.js'
-import { drawHook } from './draw.js'
-import Logic from './logic.js'
+import { drawHook } from './draw/draw.js'
+import { logic } from './logic.js'
 
 registerHook(drawHook)
 
-Logic(getNextState, switchToNextState)
+logic(getNextState, switchToNextState)
