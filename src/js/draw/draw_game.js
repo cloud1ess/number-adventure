@@ -18,6 +18,8 @@ let endGOButton
 const colours = {
   char: 'rgb(244, 122, 66)',
   currentChar: 'rgb(168, 38, 33)',
+  challenge: 'rgb(23, 107, 55)',
+  shop: 'rgb(89, 5, 86)',
   lrud: 'rgb(153, 47, 149)'
 }
 
@@ -36,38 +38,6 @@ const initPanels = (panel) => {
   panel.addChild(panels.map)
   panel.addChild(panels.chars)
   panel.addChild(panels.hud)
-}
-
-const drawMap = (map = {}, panel) => {
-  panel.drawRect({
-    x: 0,
-    y: 0,
-    wid: canvasWidth,
-    hei: canvasHeight,
-    colour: 'rgb(51, 178, 77)'
-  });
-  for (let c = 0; c < map.width; c++) {
-    for (let r = 0; r < map.height; r++) {
-      panel.drawStrokeRect({
-        x: mapPos.x + convertGridToPixels(c) - halfGridSquareSize,
-        y: mapPos.y + convertGridToPixels(r) - halfGridSquareSize,
-        wid: gridSquareSize,
-        hei: gridSquareSize
-      });
-    }
-  }
-}
-
-const drawChars = (chars = [], panel, currentChar) => {
-  chars.forEach((char, index) => {
-    panel.drawRect({
-      x: mapPos.x + convertGridToPixels(char.pos.c) - halfGridSquareSize,
-      y: mapPos.y + convertGridToPixels(char.pos.r) - halfGridSquareSize,
-      wid: gridSquareSize,
-      hei: gridSquareSize,
-      colour: index === currentChar? colours.currentChar : colours.char
-    });
-  })
 }
 
 const initHud = (panel, setInteractive) => {
@@ -96,6 +66,59 @@ const initHud = (panel, setInteractive) => {
   hudContainer.addChild(endGOButton)
   setInteractive(endGOButton, ACTIONS.ENDGO, ['mousedown'])
 }
+
+const drawMap = (map = {}, panel) => {
+  panel.drawRect({
+    x: 0,
+    y: 0,
+    wid: canvasWidth,
+    hei: canvasHeight,
+    colour: 'rgb(51, 178, 77)'
+  });
+  for (let c = 0; c < map.width; c++) {
+    for (let r = 0; r < map.height; r++) {
+      panel.drawStrokeRect({
+        x: convertGridToRender(c, 'x'),
+        y: convertGridToRender(r, 'y'),
+        wid: gridSquareSize,
+        hei: gridSquareSize
+      });
+    }
+  }
+}
+
+const drawInterestingThings = (interestingThings = [], panel) => {
+  interestingThings.forEach((interestingThing) => {
+    panel.drawRect({
+      x: convertGridToRender(interestingThing.pos.c, 'x'),
+      y: convertGridToRender(interestingThing.pos.r, 'y'),
+      wid: gridSquareSize,
+      hei: gridSquareSize,
+      colour: interestingThing.challenge ? colours.challenge : colours.shop
+    });
+    if (interestingThing.challenge && interestingThing.challenge.actionCost) {
+      panel.drawText({
+        x: convertGridToRender(interestingThing.pos.c, 'x')+5,
+        y: convertGridToRender(interestingThing.pos.r, 'y')+25,
+        text: interestingThing.challenge.actionCost,
+        font: '20px Ariel'
+      });
+    }
+  })
+}
+
+const drawChars = (chars = [], panel, currentChar) => {
+  chars.forEach((char, index) => {
+    panel.drawRect({
+      x: convertGridToRender(char.pos.c, 'x'),
+      y: convertGridToRender(char.pos.r, 'y'),
+      wid: gridSquareSize,
+      hei: gridSquareSize,
+      colour: index === currentChar? colours.currentChar : colours.char
+    });
+  })
+}
+
 const drawHud = (state) => {  
   hudContainer.setPos({
     x: 0,
@@ -132,15 +155,21 @@ const drawHud = (state) => {
   })
 
   hudContainer.drawText({
-    font: '50px Arial',
+    font: '35px Arial',
     x: 240,
     y: 60,    
-    text: state.chars[state.currentChar].moves
+    text: `Actions: ${state.chars[state.currentChar].actions}`
+  })
+  hudContainer.drawText({
+    font: '35px Arial',
+    x: 240,
+    y: 110,    
+    text: `Stars: ${state.chars[state.currentChar].stars}/${state.chars[state.currentChar].maxStars}`
   })
 
-  endGOButton.setHitBox({ x1: 300, y1: hudPadding, x2: 300+ (hudButtonSize*3), y2: hudPadding + (hudButtonSize*2) })
+  endGOButton.setHitBox({ x1: 420, y1: hudPadding, x2: 420 + (hudButtonSize*3), y2: hudPadding + (hudButtonSize*2) })
   endGOButton.drawRect({
-    x: 300,
+    x: 420,
     y: hudPadding,
     wid: hudButtonSize*3,
     hei: hudButtonSize*2,
@@ -148,8 +177,8 @@ const drawHud = (state) => {
   });
 }
 
-const convertGridToPixels = (grid) => {
-  return grid * gridSquareSize
+const convertGridToRender = (grid, xOrY) => {
+  return mapPos[xOrY] + (grid * gridSquareSize) - halfGridSquareSize
 }
 
 export const init = (state, panel, setInteractive) => {
@@ -159,6 +188,7 @@ export const init = (state, panel, setInteractive) => {
 
 export const draw = (state) => {
   drawMap(state.map, panels.map)
+  drawInterestingThings(state.interestingThings, panels.map)
   drawChars(state.chars, panels.chars, state.currentChar)
   drawHud(state)
 
