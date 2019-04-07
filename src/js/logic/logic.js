@@ -1,4 +1,4 @@
-import initGame from './initGame'
+import initGame from './initGame.js'
 
 let getState = () => { }
 let setState = () => { }
