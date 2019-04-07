@@ -1,5 +1,5 @@
 import Panel from "../../../libs/Panel";
-import { ACTIONS } from "../logic";
+import { ACTIONS } from "../logic/logic";
 
 const gridSquareSize = 32
 const halfGridSquareSize = gridSquareSize / 2
@@ -14,7 +14,7 @@ let leftButton
 let downButton
 let rightButton
 let endGOButton
-let acceptChallengeButton
+let acceptQuestButton
 
 const colours = {
   char: 'rgb(244, 122, 66)',
@@ -67,8 +67,8 @@ const initHud = (panel, setInteractive) => {
   hudContainer.addChild(endGOButton)
   setInteractive(endGOButton, ACTIONS.ENDGO, ['mousedown'])
 
-  acceptChallengeButton = new Panel()
-  panel.addChild(acceptChallengeButton)
+  acceptQuestButton = new Panel()
+  panel.addChild(acceptQuestButton)
 }
 
 const drawMap = (map = {}, panel) => {
@@ -91,21 +91,22 @@ const drawMap = (map = {}, panel) => {
   }
 }
 
-const drawInterestingThings = (interestingThings = [], panel) => {
-  interestingThings.forEach((interestingThing) => {
+const drawNPCs = (npcs = [], panel) => {
+  npcs.forEach((npc) => {
     panel.drawRect({
-      x: convertGridToRender(interestingThing.pos.c, 'x'),
-      y: convertGridToRender(interestingThing.pos.r, 'y'),
+      x: convertGridToRender(npc.pos.c, 'x'),
+      y: convertGridToRender(npc.pos.r, 'y'),
       wid: gridSquareSize,
       hei: gridSquareSize,
-      colour: interestingThing.challenge ? colours.challenge : colours.shop
+      colour: npc.quest ? colours.quest : colours.shop
     });
-    if (interestingThing.challenge && interestingThing.challenge.actionCost) {
+    if (npc.quest && npc.quest.reward) {
       panel.drawText({
-        x: convertGridToRender(interestingThing.pos.c, 'x')+5,
-        y: convertGridToRender(interestingThing.pos.r, 'y')+25,
-        text: interestingThing.challenge.actionCost,
-        font: '20px Ariel'
+        x: convertGridToRender(npc.pos.c, 'x')+5,
+        y: convertGridToRender(npc.pos.r, 'y')+25,
+        text: npc.quest.reward,
+        font: '20px Ariel',
+        colour: '#111111'
       });
     }
   })
@@ -123,43 +124,43 @@ const drawChars = (chars = [], panel, currentChar) => {
   })
 }
 
-const drawSpeech = (speech, chars, interestingThings, setInteractive) => {
-  setInteractive(acceptChallengeButton, ACTIONS.ACCEPT_CHALLENGE, ['mousedown'], true)  
+const drawSpeech = (speech, chars, npcs, setInteractive) => {
+  setInteractive(acceptQuestButton, ACTIONS.ACCEPT_QUEST, ['mousedown'], true)  
 
   if (speech) {
     let char = chars[speech.charIndex]
-    let interestingThing = interestingThings[speech.interestingThingIndex]
-    let challenge = interestingThing.challenge
+    let npc = npcs[speech.npcIndex]
+    let quest = npc.quest
 
-    if (challenge) {
-      if (!challenge.paidFor) {
+    if (quest) {
+      if (!quest.paidFor) {
         drawLargeSpeachBubble(
           char,
-          `Cost: ${challenge.cost}
-  Reward: ${challenge.reward[0]} Stars\n
+          `Cost: ${quest.cost}
+  Reward: ${quest.reward} Stars\n
   Hello ${char.name}
-  My challenge is a hard one\nwan't to try?`,
+  My quest is a hard one\nwan't to try?`,
           300,
           200,
           true,
           setInteractive
         )
         // panels.hud.drawText({
-        //   x: convertGridToRender(interestingThing.pos.c, 'x')+5,
-        //   y: convertGridToRender(interestingThing.pos.r, 'y')+25,
-        //   text: `Pay ${challenge.cost} Actions and recieve upto ${challenge.reward[0]} stars`,
+        //   x: convertGridToRender(npc.pos.c, 'x')+5,
+        //   y: convertGridToRender(npc.pos.r, 'y')+25,
+        //   text: `Pay ${quest.cost} Actions and recieve upto ${quest.reward[0]} stars`,
         //   font: '20px Ariel'
         // });
         // panels.hud.drawText({
-        //   x: convertGridToRender(interestingThing.pos.c, 'x')+5,
-        //   y: convertGridToRender(interestingThing.pos.r, 'y')+25,
-        //   text: `Pay ${challenge.cost} Actions and recieve upto ${challenge.reward[0]} stars`,
+        //   x: convertGridToRender(npc.pos.c, 'x')+5,
+        //   y: convertGridToRender(npc.pos.r, 'y')+25,
+        //   text: `Pay ${quest.cost} Actions and recieve upto ${quest.reward[0]} stars`,
         //   font: '20px Ariel'
         // });
       } else {
         drawLargeSpeachBubble(
           char,
-          challenge.question,
+          quest.question,
           300,
           200
         )
@@ -215,13 +216,13 @@ const drawLargeSpeachBubble = (char, text, wid, hei, buttonCallback, setInteract
         strokeStyle: '#000000'
       }
     });
-    acceptChallengeButton.setHitBox({ 
+    acceptQuestButton.setHitBox({ 
       x1: bx, 
       y1: by, 
       x2: bx + bw, 
       y2: by + bh 
     })
-    setInteractive(acceptChallengeButton, ACTIONS.ACCEPT_CHALLENGE, ['mousedown'])
+    setInteractive(acceptQuestButton, ACTIONS.ACCEPT_QUEST, ['mousedown'])
   }
 }
 
@@ -264,13 +265,15 @@ const drawHud = (state) => {
     font: '35px Arial',
     x: 240,
     y: 60,    
-    text: `Actions: ${state.chars[state.currentChar].actions}`
+    text: `Actions: ${state.chars[state.currentChar].actions}`,
+    colour: '#111111'
   })
   hudContainer.drawText({
     font: '35px Arial',
     x: 240,
     y: 110,    
-    text: `Stars: ${state.chars[state.currentChar].stars}/${state.chars[state.currentChar].maxStars}`
+    text: `Stars: ${state.chars[state.currentChar].stars}/${state.chars[state.currentChar].maxStars}`,
+    colour: '#111111'
   })
 
   endGOButton.setHitBox({ x1: 420, y1: hudPadding, x2: 420 + (hudButtonSize*3), y2: hudPadding + (hudButtonSize*2) })
@@ -294,8 +297,8 @@ export const init = (state, panel, setInteractive) => {
 
 export const draw = (state, setInteractive) => {
   drawMap(state.map, panels.map)
-  drawInterestingThings(state.interestingThings, panels.map)
+  drawNPCs(state.npcs, panels.map)
   drawChars(state.chars, panels.chars, state.currentChar)
-  drawSpeech(state.speech, state.chars, state.interestingThings, setInteractive)
+  drawSpeech(state.speech, state.chars, state.npcs, setInteractive)
   drawHud(state)
 }

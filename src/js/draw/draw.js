@@ -1,6 +1,6 @@
 import Utils from '../../../libs/Utils.js'
 import Panel from '../../../libs/Panel.js'
-import { VIEWS } from '../logic.js'
+import { VIEWS } from '../logic/logic.js'
 import DrawSetup from './draw_setup.js'
 import {init as initGame, draw as drawGame} from './draw_game.js'
 

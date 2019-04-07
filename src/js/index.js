@@ -1,6 +1,6 @@
 import { registerStateCallback, getState, setState } from './state.js'
 import { registerInteractionCallback, setInteractiveHook } from './interaction.js'
-import { registerStateHooks, runLogicHook, ACTIONS } from './logic.js'
+import { registerStateHooks, runLogicHook, ACTIONS } from './logic/logic.js'
 import { registerInteractionHooks, drawHook } from './draw/draw.js'
 
 registerStateCallback(drawHook) // Draw when state changes
