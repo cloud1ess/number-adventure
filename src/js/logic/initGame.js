@@ -1,4 +1,4 @@
-import {VIEWS} from './logic'
+import { VIEWS } from './logic'
 import Utils from '../../../libs/Utils'
 import scenarios from '../data/scenarios'
 import chars from '../data/chars'
@@ -10,7 +10,7 @@ const initScenario = () => {
   return scenario
 }
 
-const initChars = (startLocs, charIndexes = [0,1]) => {
+const initChars = (startLocs, charIndexes = [0, 1]) => {
   return charIndexes.map((charIndex, index) => {
     const charProps = {
       pos: {
@@ -27,20 +27,20 @@ const initChars = (startLocs, charIndexes = [0,1]) => {
 
     charProps.actions = charProps.maxActions
     charProps.stars = charProps.maxStars
-    
+
     return charProps
   })
 }
 
 const initNPCs = (npcs) => {
   npcs.forEach((npc) => {
-    if (npc.quest){
+    if (npc.quest) {
       Object.assign(npc, Utils.copy(Utils.chooseRandom(npcs)))
       Object.assign(npc.quest, {
         paidFor: false,
         complete: false,
         cost: 2,
-        reqard: Math.floor(Math.random()*3)+1
+        reqard: Math.floor(Math.random() * 3) + 1
       })
     }
   })
@@ -52,10 +52,13 @@ export default (chars) => {
   const scenario = initScenario()
 
   return {
+    camera: {
+      pos: { x: 0, y: 0 },
+      zoom: 1
+    },
     chars: initChars(scenario.startLocs, chars),
     view: VIEWS.GAME,
-    currentChar: 0,
     terrain: scenario.terrain,
-    npcs: initNPCs(scenario.npcs)    
+    npcs: initNPCs(scenario.npcs)
   }
 }

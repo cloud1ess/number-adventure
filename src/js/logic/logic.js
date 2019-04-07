@@ -27,10 +27,15 @@ const isMovable = (state, {r, c}) => {
 
 const isNearNPC = (state) => {
   const charPos = state.chars[state.currentChar].pos
-  const nearThingIndex = state.npcs.findIndex((npc) => (Math.abs(npc.pos.r-charPos.r) === 1) !== (Math.abs(npc.pos.c-charPos.c) === 1))
+  const nearThingIndex = state.npcs.findIndex((npc) => (Math.abs(npc.pos.r-charPos.r) <= 1) && (Math.abs(npc.pos.c-charPos.c) <= 1))
 
   return (nearThingIndex >= 0) ? { charIndex: state.currentChar, npcIndex: nearThingIndex } : null
 } 
+
+const moveCameraToPos = (camera, pos) => {
+  camera.pos.c = pos.c
+  camera.pos.r = pos.r
+}
 
 export const registerStateHooks = (getStateHook, setStateHook) => {
   getState = getStateHook
@@ -40,7 +45,10 @@ export const registerStateHooks = (getStateHook, setStateHook) => {
 export const runLogicHook = (actionId, event, state = getState()) => {  
   if (actionId === ACTIONS.INIT) {
     state = initGame(state.chars)
+    state.currentChar = -1
+    actionId = ACTIONS.ENDGO
   }
+
   if (state.view === VIEWS.GAME) {
     let currentChar = state.chars[state.currentChar]
     
@@ -71,6 +79,8 @@ export const runLogicHook = (actionId, event, state = getState()) => {
       }
       state.chars[state.currentChar].actions = state.chars[state.currentChar].maxActions
     }
+
+    moveCameraToPos(state.camera, state.chars[state.currentChar].pos)
     state.speech = isNearNPC(state)
   }
 

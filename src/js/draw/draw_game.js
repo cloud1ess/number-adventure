@@ -1,8 +1,8 @@
 import Panel from "../../../libs/Panel";
 import { ACTIONS } from "../logic/logic";
+import Terrain from "../data/terrain";
 
-const gridSquareSize = 32
-const halfGridSquareSize = gridSquareSize / 2
+const gridSquareSize = 48
 const canvasWidth = 600
 const canvasHeight = 600
 const hudPadding = 16
@@ -19,7 +19,7 @@ let acceptQuestButton
 const colours = {
   char: 'rgb(244, 122, 66)',
   currentChar: 'rgb(168, 38, 33)',
-  challenge: 'rgb(23, 107, 55)',
+  quest: 'rgb(89, 5, 86)',
   shop: 'rgb(89, 5, 86)',
   lrud: 'rgb(153, 47, 149)'
 }
@@ -71,39 +71,49 @@ const initHud = (panel, setInteractive) => {
   panel.addChild(acceptQuestButton)
 }
 
-const drawMap = (map = {}, panel) => {
+const drawTerrain = (terrain = [], panel, camera) => {
   panel.drawRect({
     x: 0,
     y: 0,
     wid: canvasWidth,
     hei: canvasHeight,
-    colour: 'rgb(51, 178, 77)'
+    colour: Terrain[0].colour
   });
-  for (let c = 0; c < map.width; c++) {
-    for (let r = 0; r < map.height; r++) {
-      panel.drawStrokeRect({
-        x: convertGridToRender(c, 'x'),
-        y: convertGridToRender(r, 'y'),
-        wid: gridSquareSize,
-        hei: gridSquareSize
+  let renderSize = scaleForRender(gridSquareSize, camera)
+  
+  terrain.forEach((row, r) => {
+    row.forEach((terrainIndex, c) => {
+      let renderPos = convertGridToRender({r, c}, camera)
+      panel.drawRect({
+        x: renderPos.x,
+        y: renderPos.y,
+        wid: renderSize,
+        hei: renderSize,
+        colour: Terrain[terrainIndex].colour,
+        stroke: {
+          strokeStyle: '#000000',
+          lineWidth: 1
+        }
       });
-    }
-  }
+    })
+  })
 }
 
-const drawNPCs = (npcs = [], panel) => {
+const drawNPCs = (npcs = [], panel, camera) => {
+  let renderSize = scaleForRender(gridSquareSize, camera)
   npcs.forEach((npc) => {
+    let renderPos = convertGridToRender(npc.pos, camera)
     panel.drawRect({
-      x: convertGridToRender(npc.pos.c, 'x'),
-      y: convertGridToRender(npc.pos.r, 'y'),
-      wid: gridSquareSize,
-      hei: gridSquareSize,
+      x: renderPos.x,
+      y: renderPos.y,
+      wid: renderSize,
+      hei: renderSize,
       colour: npc.quest ? colours.quest : colours.shop
     });
     if (npc.quest && npc.quest.reward) {
       panel.drawText({
-        x: convertGridToRender(npc.pos.c, 'x')+5,
-        y: convertGridToRender(npc.pos.r, 'y')+25,
+        x: renderPos.x+5,
+        y: renderPos.y+25,
         text: npc.quest.reward,
         font: '20px Ariel',
         colour: '#111111'
@@ -112,13 +122,15 @@ const drawNPCs = (npcs = [], panel) => {
   })
 }
 
-const drawChars = (chars = [], panel, currentChar) => {
+const drawChars = (chars = [], panel, currentChar, camera) => {
   chars.forEach((char, index) => {
+    let renderPos = convertGridToRender(char.pos, camera)
+    let renderSize = scaleForRender(gridSquareSize, camera)
     panel.drawRect({
-      x: convertGridToRender(char.pos.c, 'x'),
-      y: convertGridToRender(char.pos.r, 'y'),
-      wid: gridSquareSize,
-      hei: gridSquareSize,
+      x: renderPos.x,
+      y: renderPos.y,
+      wid: renderSize,
+      hei: renderSize,
       colour: index === currentChar? colours.currentChar : colours.char
     });
   })
@@ -286,8 +298,16 @@ const drawHud = (state) => {
   });
 }
 
-const convertGridToRender = (grid, xOrY) => {
-  return mapPos[xOrY] + (grid * gridSquareSize) - halfGridSquareSize
+const convertGridToRender = (grid, camera) => {
+  const renderGridSize = scaleForRender(gridSquareSize, camera)
+  return {
+    x: ((-camera.pos.c + grid.c - 0.5) * renderGridSize) + (canvasWidth/2),
+    y: ((-camera.pos.r + grid.r - 0.5) * renderGridSize) + (canvasHeight/2),
+  }
+}
+
+const scaleForRender = (origSize, camera) => {
+  return origSize * camera.zoom
 }
 
 export const init = (state, panel, setInteractive) => {
@@ -296,9 +316,9 @@ export const init = (state, panel, setInteractive) => {
 }
 
 export const draw = (state, setInteractive) => {
-  drawMap(state.map, panels.map)
-  drawNPCs(state.npcs, panels.map)
-  drawChars(state.chars, panels.chars, state.currentChar)
+  drawTerrain(state.terrain, panels.map, state.camera)
+  drawNPCs(state.npcs, panels.map, state.camera)
+  drawChars(state.chars, panels.chars, state.currentChar, state.camera)
   drawSpeech(state.speech, state.chars, state.npcs, setInteractive)
   drawHud(state)
 }
