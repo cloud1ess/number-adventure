@@ -14,6 +14,7 @@ let leftButton
 let downButton
 let rightButton
 let endGOButton
+let acceptChallengeButton
 
 const colours = {
   char: 'rgb(244, 122, 66)',
@@ -65,6 +66,9 @@ const initHud = (panel, setInteractive) => {
   endGOButton = new Panel()
   hudContainer.addChild(endGOButton)
   setInteractive(endGOButton, ACTIONS.ENDGO, ['mousedown'])
+
+  acceptChallengeButton = new Panel()
+  panel.addChild(acceptChallengeButton)
 }
 
 const drawMap = (map = {}, panel) => {
@@ -117,6 +121,108 @@ const drawChars = (chars = [], panel, currentChar) => {
       colour: index === currentChar? colours.currentChar : colours.char
     });
   })
+}
+
+const drawSpeech = (speech, chars, interestingThings, setInteractive) => {
+  setInteractive(acceptChallengeButton, ACTIONS.ACCEPT_CHALLENGE, ['mousedown'], true)  
+
+  if (speech) {
+    let char = chars[speech.charIndex]
+    let interestingThing = interestingThings[speech.interestingThingIndex]
+    let challenge = interestingThing.challenge
+
+    if (challenge) {
+      if (!challenge.paidFor) {
+        drawLargeSpeachBubble(
+          char,
+          `Cost: ${challenge.cost}
+  Reward: ${challenge.reward[0]} Stars\n
+  Hello ${char.name}
+  My challenge is a hard one\nwan't to try?`,
+          300,
+          200,
+          true,
+          setInteractive
+        )
+        // panels.hud.drawText({
+        //   x: convertGridToRender(interestingThing.pos.c, 'x')+5,
+        //   y: convertGridToRender(interestingThing.pos.r, 'y')+25,
+        //   text: `Pay ${challenge.cost} Actions and recieve upto ${challenge.reward[0]} stars`,
+        //   font: '20px Ariel'
+        // });
+        // panels.hud.drawText({
+        //   x: convertGridToRender(interestingThing.pos.c, 'x')+5,
+        //   y: convertGridToRender(interestingThing.pos.r, 'y')+25,
+        //   text: `Pay ${challenge.cost} Actions and recieve upto ${challenge.reward[0]} stars`,
+        //   font: '20px Ariel'
+        // });
+      } else {
+        drawLargeSpeachBubble(
+          char,
+          challenge.question,
+          300,
+          200
+        )
+      }
+    }
+  }
+}
+
+const drawLargeSpeachBubble = (char, text, wid, hei, buttonCallback, setInteractive) => {
+  let panel = panels.hud
+
+  const x = (canvasWidth - wid) / 2
+  const y = (canvasHeight - hei) /2
+  const p = 10
+  const lineheight = 20;
+
+  panel.drawRect({
+    x: x,
+    y: y,
+    wid: wid,
+    hei: hei,
+    colour: '#EEEEEE',
+    rounded: 10,
+    stroke: {
+      lineWidth: 2,
+	    strokeStyle: '#000000'
+    }
+  });
+  text.split('\n').forEach((line, index) => {
+    panel.drawText({
+      x: x + p,
+      y: y + p + (lineheight * (index+1)),
+      text: line,
+      font: '20px Ariel',
+      colour: '#111111'
+    });
+  })
+  if (buttonCallback) {
+
+    const bw =  100
+    const bh =  50
+    const bx =  (canvasWidth - bw) / 2
+    const by =  y + hei - p - bh
+    panel.drawRect({
+      x: bx,
+      y: by,
+      wid: bw,
+      hei: bh,
+      colour: colours.lrud,
+      rounded: 5,
+      stroke: {
+        lineWidth: 2,
+        strokeStyle: '#000000'
+      }
+    });
+    acceptChallengeButton.setHitBox({ 
+      x1: bx, 
+      y1: by, 
+      x2: bx + bw, 
+      y2: by + bh 
+    })
+    setInteractive(acceptChallengeButton, ACTIONS.ACCEPT_CHALLENGE, ['mousedown'])
+  }
 }
 
 const drawHud = (state) => {  
@@ -186,11 +292,10 @@ export const init = (state, panel, setInteractive) => {
   initHud(panels.hud, setInteractive)
 }
 
-export const draw = (state) => {
+export const draw = (state, setInteractive) => {
   drawMap(state.map, panels.map)
   drawInterestingThings(state.interestingThings, panels.map)
   drawChars(state.chars, panels.chars, state.currentChar)
+  drawSpeech(state.speech, state.chars, state.interestingThings, setInteractive)
   drawHud(state)
-
-  console.log("DRAW GAME")
 }

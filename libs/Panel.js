@@ -11,7 +11,6 @@ export default function (canvasElement, hitBox) {
 	let children = [];
 	let eventCallbacks = {};
 	let mouseHitBox = hitBox;
-	let mouseEnabled = {mousedown: false, mouseup: false, mousemove: false, mousewheel: false};
 	let canvas
 	 
 	if (canvasElement) {
@@ -77,7 +76,7 @@ export default function (canvasElement, hitBox) {
 			children[i].sinkMouseEvent(evt);
 			i--;
 		}
-		if (!evt.handled && mouseEnabled && mouseEnabled[evt.type]) {
+		if (!evt.handled && eventCallbacks[evt.type] && eventCallbacks[evt.type].length) {
 			if (!mouseHitBox || MathUtils.pointInRect(evt.x, evt.y, realPos.x + mouseHitBox.x1, realPos.y + mouseHitBox.y1, realPos.x + mouseHitBox.x2, realPos.y + mouseHitBox.y2)) {
 				fireEvent(evt);
 			}
@@ -147,6 +146,9 @@ export default function (canvasElement, hitBox) {
 	}
 	function drawStrokeRect (data) {
 		addToDrawList(CanvasRender.strokeRect, data);
+	}
+	function drawFillRect (data) {
+		addToDrawList(CanvasRender.fillRect, data);
 	}
 	function drawCircle (data) {
 		addToDrawList(CanvasRender.circle, data);
@@ -230,15 +232,23 @@ export default function (canvasElement, hitBox) {
 		if (!eventCallbacks[type]) {
 			eventCallbacks[type] = [];
 		}
-		mouseEnabled[type] = true
 
 		eventCallbacks[type].push(callback);
+	}
+
+	function removeEventCallback (type, callback) {
+		if (eventCallbacks[type]) {
+			if (callback) {
+				eventCallbacks[type].slice(eventCallbacks[type].indexOf(callback), 1);
+			} else {
+				delete eventCallbacks[type]
+			}
+		}
 	}
 
 	function tearDown (removeFromParent) {
 		toDraw.length = 0;
 		eventCallbacks = null;
-		mouseEnabled = null
 		canvas = null
 		if (canvasElement) {
 			canvasElement.removeEventListener('mousedown', globalMouseHandle.bind(this), false);
@@ -259,28 +269,30 @@ export default function (canvasElement, hitBox) {
 	}
 
 	return {
-		addChild: addChild,
-		removeChild: removeChild,
-		removeAllChildren: removeAllChildren,
-		render: render,
-		clear: clear,
-		drawLine: drawLine,
-		drawRect: drawRect,
-		drawStrokeRect: drawStrokeRect,
-		drawCircle: drawCircle,
-		drawPath: drawPath,
-		drawImage: drawImage,
-		drawText: drawText,
-		drawSprite: drawSprite,
-		drawImageData: drawImageData,
-		playSprite: playSprite,
+		addChild,
+		removeChild,
+		removeAllChildren,
+		render,
+		clear,
+		drawLine,
+		drawRect,
+		drawStrokeRect,
+		drawFillRect,
+		drawCircle,
+		drawPath,
+		drawImage,
+		drawText,
+		drawSprite,
+		drawImageData,
+		playSprite,
 		updateRealPos,
-		setPos: setPos,
-		setRotation: setRotation,
-		setHitBox: setHitBox,
-		fireEvent: fireEvent,
-		sinkMouseEvent: sinkMouseEvent,
-		addEventCallback: addEventCallback,
-		tearDown: tearDown
+		setPos,
+		setRotation,
+		setHitBox,
+		fireEvent,
+		sinkMouseEvent,
+		addEventCallback,
+		removeEventCallback,
+		tearDown
 	}
 }

@@ -40,7 +40,7 @@ export const drawHook = (state) => {
       initDrawView(state)
     }
     panel.clear()
-    drawView[state.view](state, panel)
+    drawView[state.view](state, setInteractive)
     panel.render()
   } else {
     console.log(`No Draw function for view: ${state.view}`)

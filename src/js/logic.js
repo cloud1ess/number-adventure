@@ -7,12 +7,13 @@ export const VIEWS = {
 }
 
 export const ACTIONS = {
-  INIT: 'init',
-  UP: 'up',
-  LEFT: 'left',
-  DOWN: 'down',
-  RIGHT: 'right',
-  ENDGO: 'endgo'
+  INIT: 0,
+  UP: 1,
+  LEFT: 2,
+  DOWN: 3,
+  RIGHT: 4,
+  ENDGO: 5,
+  ACCEPT_CHALLENGE: 6
 }
 
 const isMovable = (state, {r, c}) => {
@@ -22,8 +23,11 @@ const isMovable = (state, {r, c}) => {
   ].some((thing) => thing.pos.r === r && thing.pos.c === c)
 } 
 
-const isNearSomethingInteresting = (pos, state) => {
-  return state.interestingThings.find((thing) => Math.abs(thing.pos.r-pos.r) <=1 && Math.abs(thing.pos.c-pos.c) <=1)
+const isNearSomethingInteresting = (state) => {
+  const charPos = state.chars[state.currentChar].pos
+  const nearThingIndex = state.interestingThings.findIndex((thing) => Math.abs(thing.pos.r-charPos.r) <=1 && Math.abs(thing.pos.c-charPos.c) <=1)
+
+  return (nearThingIndex >= 0) ? { charIndex: state.currentChar, interestingThingIndex: nearThingIndex } : null
 } 
 
 export const registerStateHooks = (getStateHook, setStateHook) => {
@@ -48,7 +52,8 @@ export const runLogicHook = (actionId, event, state = getState()) => {
             r: 5
           },
           challenge: {
-            actionCost: 2,
+            paidFor: false,
+            cost: 2,
             question: "What is 3 * 5?",
             choices: [12,14,15,20],
             answer: 15,
@@ -70,6 +75,7 @@ export const runLogicHook = (actionId, event, state = getState()) => {
           c: 10,
           r: 10
         },
+        name: 'Tom',
         actions: 10,
         maxActions: 10,
         stars: 0,
@@ -80,6 +86,7 @@ export const runLogicHook = (actionId, event, state = getState()) => {
           c: 10,
           r: 10
         },
+        name: 'Laura',
         actions: 0,
         maxActions: 10,
         stars: 0,
@@ -89,7 +96,7 @@ export const runLogicHook = (actionId, event, state = getState()) => {
     }
   }
   if (state.view === VIEWS.GAME) {
-    const currentChar = state.chars[state.currentChar]
+    let currentChar = state.chars[state.currentChar]
     
     if (actionId === ACTIONS.UP && currentChar.actions > 0 && isMovable(state, {r: currentChar.pos.r-1, c: currentChar.pos.c})) {
       currentChar.pos.r --
@@ -103,6 +110,14 @@ export const runLogicHook = (actionId, event, state = getState()) => {
     } else if (actionId === ACTIONS.RIGHT && currentChar.actions > 0 && isMovable(state, {r: currentChar.pos.r, c: currentChar.pos.c+1})) {
       currentChar.pos.c ++
       currentChar.actions --
+    } else if (actionId === ACTIONS.ACCEPT_CHALLENGE) {
+      let challenge = state.interestingThings[state.speech.interestingThingIndex]
+      challenge = challenge.challenge || {}
+
+      if (challenge.cost && currentChar.actions >= challenge.cost) {
+        currentChar.actions -= challenge.cost
+        challenge.paidFor = true
+      }
     } else if (actionId === ACTIONS.ENDGO) {
       state.currentChar ++
       if (state.currentChar >= state.chars.length) {
@@ -110,7 +125,7 @@ export const runLogicHook = (actionId, event, state = getState()) => {
       }
       state.chars[state.currentChar].actions = state.chars[state.currentChar].maxActions
     }
-    currentChar.near = isNearSomethingInteresting(currentChar.pos, state)
+    state.speech = isNearSomethingInteresting(state)
   }
 
   setState(state)
