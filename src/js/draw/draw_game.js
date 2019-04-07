@@ -1,6 +1,6 @@
-import Panel from "../../../libs/Panel";
-import { ACTIONS } from "../logic/logic";
-import Terrain from "../data/terrain";
+import Panel from "../../../libs/Panel.js";
+import { ACTIONS } from "../logic/logic.js";
+import Terrain from "../data/terrain.js";
 
 const gridSquareSize = 48
 const canvasWidth = 600

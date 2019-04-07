@@ -1,8 +1,8 @@
-import { VIEWS } from './logic'
-import Utils from '../../../libs/Utils'
-import scenarios from '../data/scenarios'
-import chars from '../data/chars'
-import npcs from '../data/npcs'
+import { VIEWS } from './logic.js'
+import Utils from '../../../libs/Utils.js'
+import scenarios from '../data/scenarios.js'
+import chars from '../data/chars.js'
+import npcs from '../data/npcs.js'
 
 const initScenario = () => {
   const scenario = Utils.copy(Utils.chooseRandom(scenarios))
