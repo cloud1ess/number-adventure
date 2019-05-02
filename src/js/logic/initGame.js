@@ -1,11 +1,12 @@
 import { VIEWS } from './logic.js'
 import Utils from '../../../libs/Utils.js'
-import scenarios from '../data/scenarios.js'
-import chars from '../data/chars.js'
-import npcs from '../data/npcs.js'
+import Scenarios from '../data/scenarios.js'
+import Chars from '../data/chars.js'
+import Npcs from '../data/npcs.js'
+import Quests from '../data/quests.js'
 
 const initScenario = () => {
-  const scenario = Utils.copy(Utils.chooseRandom(scenarios))
+  const scenario = Utils.copy(Utils.chooseRandom(Scenarios))
 
   return scenario
 }
@@ -23,7 +24,7 @@ const initChars = (startLocs, charIndexes = [0, 1]) => {
       description: 'Very strong'
     }
 
-    Object.assign(charProps, Utils.copy(chars[charIndex]))
+    Object.assign(charProps, Utils.copy(Chars[charIndex]))
 
     charProps.actions = charProps.maxActions
     charProps.stars = charProps.maxStars
@@ -35,13 +36,8 @@ const initChars = (startLocs, charIndexes = [0, 1]) => {
 const initNPCs = (npcs) => {
   npcs.forEach((npc) => {
     if (npc.quest) {
-      Object.assign(npc, Utils.copy(Utils.chooseRandom(npcs)))
-      Object.assign(npc.quest, {
-        paidFor: false,
-        complete: false,
-        cost: 2,
-        reqard: Math.floor(Math.random() * 3) + 1
-      })
+      Object.assign(npc, Utils.copy(Utils.chooseRandom(Npcs)))
+      Object.assign(npc.quest, Utils.chooseRandom(Quests['1']).generate())
     }
   })
 

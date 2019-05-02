@@ -12,7 +12,7 @@ export default function (canvasElement, hitBox) {
 	let eventCallbacks = {};
 	let mouseHitBox = hitBox;
 	let canvas
-	 
+
 	if (canvasElement) {
 		canvas = canvasElement.getContext("2d");
 		canvasElement.addEventListener('mousedown', globalMouseHandle.bind(this), false);

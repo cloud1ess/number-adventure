@@ -158,5 +158,15 @@ export default {
   },
   last: function (arr) {
     return arr[arr.length-1]
+  },
+  randomise: function (arr) {
+    const temp = this.copy(arr)
+    const randomised = []
+    while (temp.length) {
+      let i = Math.floor(Math.random() * temp.length)
+      randomised.push(temp[i])
+      temp.splice(i, 1)
+    }
+    return randomised
   }
 }

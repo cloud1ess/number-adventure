@@ -15,7 +15,8 @@ export const ACTIONS = {
   DOWN: 3,
   RIGHT: 4,
   ENDGO: 5,
-  ACCEPT_QUEST: 6
+  ACCEPT_QUEST: 6,
+  ANSWER_QUESTION: 7
 }
 
 const isMovable = (state, {r, c}) => {
@@ -23,14 +24,14 @@ const isMovable = (state, {r, c}) => {
     ...state.npcs,
     ...state.chars
   ].some((thing) => thing.pos.r === r && thing.pos.c === c)
-} 
+}
 
 const isNearNPC = (state) => {
   const charPos = state.chars[state.currentChar].pos
   const nearThingIndex = state.npcs.findIndex((npc) => (Math.abs(npc.pos.r-charPos.r) <= 1) && (Math.abs(npc.pos.c-charPos.c) <= 1))
 
   return (nearThingIndex >= 0) ? { charIndex: state.currentChar, npcIndex: nearThingIndex } : null
-} 
+}
 
 const moveCameraToPos = (camera, pos) => {
   camera.pos.c = pos.c
@@ -42,7 +43,7 @@ export const registerStateHooks = (getStateHook, setStateHook) => {
   setState = setStateHook
 }
 
-export const runLogicHook = (actionId, event, state = getState()) => {  
+export const runLogicHook = (actionId, event, state = getState()) => {
   if (actionId === ACTIONS.INIT) {
     state = initGame(state.chars)
     state.currentChar = -1
@@ -51,7 +52,7 @@ export const runLogicHook = (actionId, event, state = getState()) => {
 
   if (state.view === VIEWS.GAME) {
     let currentChar = state.chars[state.currentChar]
-    
+
     if (actionId === ACTIONS.UP && currentChar.actions > 0 && isMovable(state, {r: currentChar.pos.r-1, c: currentChar.pos.c})) {
       currentChar.pos.r --
       currentChar.actions --
@@ -78,6 +79,10 @@ export const runLogicHook = (actionId, event, state = getState()) => {
         state.currentChar = 0
       }
       state.chars[state.currentChar].actions = state.chars[state.currentChar].maxActions
+    } else if (actionId === ACTIONS.ANSWER_QUESTION) {
+      event.data.answer === 0
+      quest.complete = true
+
     }
 
     moveCameraToPos(state.camera, state.chars[state.currentChar].pos)

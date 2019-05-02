@@ -46,19 +46,19 @@ const initHud = (panel, setInteractive) => {
 
   hudContainer = new Panel()
   panel.addChild(hudContainer)
-  
+
   upButton = new Panel()
   hudContainer.addChild(upButton)
   setInteractive(upButton, ACTIONS.UP, ['mousedown'])
-  
+
   leftButton = new Panel()
   hudContainer.addChild(leftButton)
   setInteractive(leftButton, ACTIONS.LEFT, ['mousedown'])
-  
+
   downButton = new Panel()
   hudContainer.addChild(downButton)
   setInteractive(downButton, ACTIONS.DOWN, ['mousedown'])
-  
+
   rightButton = new Panel()
   hudContainer.addChild(rightButton)
   setInteractive(rightButton, ACTIONS.RIGHT, ['mousedown'])
@@ -80,7 +80,7 @@ const drawTerrain = (terrain = [], panel, camera) => {
     colour: Terrain[0].colour
   });
   let renderSize = scaleForRender(gridSquareSize, camera)
-  
+
   terrain.forEach((row, r) => {
     row.forEach((terrainIndex, c) => {
       let renderPos = convertGridToRender({r, c}, camera)
@@ -137,7 +137,7 @@ const drawChars = (chars = [], panel, currentChar, camera) => {
 }
 
 const drawSpeech = (speech, chars, npcs, setInteractive) => {
-  setInteractive(acceptQuestButton, ACTIONS.ACCEPT_QUEST, ['mousedown'], true)  
+  setInteractive(acceptQuestButton, ACTIONS.ACCEPT_QUEST, ['mousedown'], true)
 
   if (speech) {
     let char = chars[speech.charIndex]
@@ -154,7 +154,7 @@ const drawSpeech = (speech, chars, npcs, setInteractive) => {
   My quest is a hard one\nwan't to try?`,
           300,
           200,
-          true,
+          [{label:'Accept', action: ACTIONS.ACCEPT_QUEST}],
           setInteractive
         )
         // panels.hud.drawText({
@@ -174,14 +174,21 @@ const drawSpeech = (speech, chars, npcs, setInteractive) => {
           char,
           quest.question,
           300,
-          200
+          200,
+          quest.options.map((option) => {
+            return {
+              label: option,
+              action: ACTIONS.ANSWER_QUESTION
+            }
+          }),
+          setInteractive
         )
       }
     }
   }
 }
 
-const drawLargeSpeachBubble = (char, text, wid, hei, buttonCallback, setInteractive) => {
+const drawLargeSpeachBubble = (char, text, wid, hei, buttonInfo, setInteractive) => {
   let panel = panels.hud
 
   const x = (canvasWidth - wid) / 2
@@ -210,35 +217,60 @@ const drawLargeSpeachBubble = (char, text, wid, hei, buttonCallback, setInteract
       colour: '#111111'
     });
   })
-  if (buttonCallback) {
+  if (buttonInfo) {
 
     const bw =  100
     const bh =  50
-    const bx =  (canvasWidth - bw) / 2
+    let bx =  (canvasWidth - ((bw + p) * buttonInfo.length) ) / 2
     const by =  y + hei - p - bh
-    panel.drawRect({
-      x: bx,
-      y: by,
-      wid: bw,
-      hei: bh,
-      colour: colours.lrud,
-      rounded: 5,
-      stroke: {
-        lineWidth: 2,
-        strokeStyle: '#000000'
+
+    const drawButton = (bx, by, bw, bh, action, button, label) => {
+      panel.drawRect({
+        x: bx,
+        y: by,
+        wid: bw,
+        hei: bh,
+        colour: colours.lrud,
+        rounded: 5,
+        stroke: {
+          lineWidth: 2,
+          strokeStyle: '#000000'
+        }
+      });
+      if (label) {
+        panel.drawText({
+          x: bx + p,
+          y: by + p,
+          text: label,
+          font: '20px Ariel',
+          colour: '#111111'
+        });
       }
-    });
-    acceptQuestButton.setHitBox({ 
-      x1: bx, 
-      y1: by, 
-      x2: bx + bw, 
-      y2: by + bh 
+      button.setHitBox({
+        x1: bx,
+        y1: by,
+        x2: bx + bw,
+        y2: by + bh
+      })
+      setInteractive(button, action, ['mousedown'], false, {answer: label})
+    }
+
+    buttonInfo.forEach((info, index) => {
+      drawButton(
+        bx,
+        by,
+        bw,
+        bh,
+        info.action,
+        acceptQuestButton,
+        info.label
+      )
+      bx += (bw + p)
     })
-    setInteractive(acceptQuestButton, ACTIONS.ACCEPT_QUEST, ['mousedown'])
   }
 }
 
-const drawHud = (state) => {  
+const drawHud = (state) => {
   hudContainer.setPos({
     x: 0,
     y: canvasHeight - (hudButtonSize * 2) - (hudPadding * 3)
@@ -276,14 +308,14 @@ const drawHud = (state) => {
   hudContainer.drawText({
     font: '35px Arial',
     x: 240,
-    y: 60,    
+    y: 60,
     text: `Actions: ${state.chars[state.currentChar].actions}`,
     colour: '#111111'
   })
   hudContainer.drawText({
     font: '35px Arial',
     x: 240,
-    y: 110,    
+    y: 110,
     text: `Stars: ${state.chars[state.currentChar].stars}/${state.chars[state.currentChar].maxStars}`,
     colour: '#111111'
   })
