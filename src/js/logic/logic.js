@@ -16,7 +16,8 @@ export const ACTIONS = {
   RIGHT: 4,
   ENDGO: 5,
   ACCEPT_QUEST: 6,
-  ANSWER_QUESTION: 7
+  ANSWER_QUESTION_CORRECT: 7,
+  ANSWER_QUESTION_WRONG: 8
 }
 
 const isMovable = (state, {r, c}) => {
@@ -79,10 +80,14 @@ export const runLogicHook = (actionId, event, state = getState()) => {
         state.currentChar = 0
       }
       state.chars[state.currentChar].actions = state.chars[state.currentChar].maxActions
-    } else if (actionId === ACTIONS.ANSWER_QUESTION) {
-      event.data.answer === 0
+    } else if (actionId === ACTIONS.ANSWER_QUESTION_CORRECT) {
+      let quest = state.npcs[state.speech.npcIndex].quest
+      const char = state.chars[state.currentChar]
+      char.stars += quest.reward
       quest.complete = true
-
+    } else if (actionId === ACTIONS.ANSWER_QUESTION_WRONG) {
+      let quest = state.npcs[state.speech.npcIndex].quest
+      quest.reward = Math.max(1, quest.reward-1)
     }
 
     moveCameraToPos(state.camera, state.chars[state.currentChar].pos)

@@ -19,15 +19,15 @@ const initChars = (startLocs, charIndexes = [0, 1]) => {
         r: startLocs[index].r
       },
       maxActions: 10,
-      maxStars: 6,
+      stars: 0,
       bonuses: [],
+      items: [],
       description: 'Very strong'
     }
 
     Object.assign(charProps, Utils.copy(Chars[charIndex]))
 
     charProps.actions = charProps.maxActions
-    charProps.stars = charProps.maxStars
 
     return charProps
   })
