@@ -3,7 +3,6 @@ import Utils from '../../../libs/Utils.js'
 import Scenarios from '../data/scenarios.js'
 import Chars from '../data/chars.js'
 import Npcs from '../data/npcs.js'
-import Quests from '../data/quests.js'
 
 const initScenario = () => {
   const scenario = Utils.copy(Utils.chooseRandom(Scenarios))
@@ -37,7 +36,6 @@ const initNPCs = (npcs) => {
   npcs.forEach((npc) => {
     if (npc.quest) {
       Object.assign(npc, Utils.copy(Utils.chooseRandom(Npcs)))
-      Object.assign(npc.quest, Utils.chooseRandom(Quests['1']).generate())
     }
   })
 

@@ -118,11 +118,11 @@ const drawNPCs = (npcs = [], panel, camera) => {
       hei: renderSize,
       colour: npc.quest ? colours.quest : colours.shop
     });
-    if (npc.quest && npc.quest.reward) {
+    if (npc.quest) {
       panel.drawText({
         x: renderPos.x + 5,
         y: renderPos.y + 25,
-        text: npc.quest.reward,
+        text: npc.quest.difficulty,
         font: "20px Ariel",
         colour: "#111111"
       });
@@ -152,12 +152,12 @@ const drawSpeech = (speech, chars, npcs, setInteractive) => {
     let npc = npcs[speech.npcIndex];
     let quest = npc.quest;
 
-    if (quest && !quest.complete) {
-      if (!quest.paidFor) {
+    if (quest) {
+      if (!quest.current) {
         drawLargeSpeachBubble(
           char,
-          `Cost: ${quest.cost}
-  Reward: ${quest.reward} Stars\n
+          `Cost: ${2}
+  Diffuculty: ${quest.difficulty}\n
   Hello ${char.name}
   My quest is a hard one\nwan't to try?`,
           300,
@@ -182,15 +182,16 @@ const drawSpeech = (speech, chars, npcs, setInteractive) => {
         //   font: '20px Ariel'
         // });
       } else {
+        const questData = quest.current
         drawLargeSpeachBubble(
           char,
-          quest.question,
+          questData.question,
           300,
           200,
-          quest.options.map((option, index) => {
+          questData.options.map((option, index) => {
             return {
               label: option,
-              action: option === quest.answer? ACTIONS.ANSWER_QUESTION_CORRECT : ACTIONS.ANSWER_QUESTION_WRONG,
+              action: option === questData.answer? ACTIONS.ANSWER_QUESTION_CORRECT : ACTIONS.ANSWER_QUESTION_WRONG,
               button: answerQuestionButtons[index]
             };
           }),

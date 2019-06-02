@@ -1,5 +1,11 @@
 export default [{
-  name: 'Tom'
+  name: 'Tom',
+  quest: {
+    difficulty: 1
+  }
 },{
-  name: 'Laura'
+  name: 'Laura',
+  quest: {
+    difficulty: 1
+  }
 }]

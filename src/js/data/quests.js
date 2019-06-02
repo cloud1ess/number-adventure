@@ -15,61 +15,75 @@ const genQuestAnswers = (answer, numOfOptions) => {
   return Utils.randomise(otherOptions)
 }
 
-
 export default {
   1: [
-    {
-      generate: () => {
-        const a = Math.floor(Math.random()+5)+5
-        const b = Math.floor(Math.random()+5)
-        const answer = a + b
-        const options = genQuestAnswers(answer, 3)
+    () => {
+      const a = Math.floor(Math.random()+5)+5
+      const b = Math.floor(Math.random()+5)
+      const answer = a + b
+      const options = genQuestAnswers(answer, 3)
 
-        return {
-          question: `What is ${a} + ${b}?`,
-          answer,
-          options,
-          cost: 1,
-          reward: 1,
-          complete: false,
-          paidFor: false
-        }
+      return {
+        question: `What is ${a} + ${b}?`,
+        answer,
+        options,
+        cost: 1,
+        reward: 1
       }
-    }
+    },
+    () => {
+      const a = Math.floor(Math.random()+5)+5
+      const b = Math.floor(Math.random()+5)
+      const answer = a - b
+      const options = genQuestAnswers(answer, 3)
+
+      return {
+        question: `What is ${a} - ${b}?`,
+        answer,
+        options,
+        cost: 1,
+        reward: 1
+      }
+    },
+    () => {
+      const a = Math.floor(Math.random()+5)
+      const b = 2
+      const answer = a * b
+      const options = genQuestAnswers(answer, 3)
+      return {
+        question: `What is ${a} * ${b}?`,
+        answer: a * b,
+        options,
+        cost: 2,
+        reward: 1
+      }
+    }     
   ],
   2: [
-    {
-      generate: () => {
-        const a = Math.floor(Math.random()+5)
-        const b = 2
-        const answer = a * b
-        const options = genQuestAnswers(answer, 3)
-        return {
-          question: `What is ${a} * ${b}?`,
-          answer: a * b,
-          options,
-          cost: 2,
-          reward: 1,
-          complete: false,
-          paidFor: false
-        }
+    () => {
+      const a = Math.floor(Math.random()+5)
+      const b = 2
+      const answer = a * b
+      const options = genQuestAnswers(answer, 3)
+      return {
+        question: `What is ${a} * ${b}?`,
+        answer: a * b,
+        options,
+        cost: 2,
+        reward: 1
       }
-    }
+    }    
   ],
-  3: [
-    {
-      generate: () => {
-        const a = Math.floor(Math.random()+5)+5
-        const b = 2
-        return {
-          question: `What is ${a} * ${b}?`,
-          answer: a * b,
-          cost: 3,
-          reward: 1,
-          complete: false,
-          paidFor: false
-        }
-      }
+  3: [    
+    () => {
+      const a = Math.floor(Math.random()+5)+5
+      const b = 2
+      return {
+        question: `What is ${a} * ${b}?`,
+        answer: a * b,
+        cost: 3,
+        reward: 1
+      }      
     }
   ]
 }

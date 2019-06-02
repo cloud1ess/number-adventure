@@ -1,4 +1,6 @@
 import initGame from './initGame.js'
+import Quests from '../data/quests.js'
+import Utils from '../../../libs/Utils.js'
 
 let getState = () => { }
 let setState = () => { }
@@ -67,12 +69,11 @@ export const runLogicHook = (actionId, event, state = getState()) => {
       currentChar.pos.c ++
       currentChar.actions --
     } else if (actionId === ACTIONS.ACCEPT_QUEST) {
-      let quest = state.npcs[state.speech.npcIndex]
-      quest = quest.quest || {}
+      let quest = state.npcs[state.speech.npcIndex].quest
 
-      if (quest.cost && currentChar.actions >= quest.cost) {
-        currentChar.actions -= quest.cost
-        quest.paidFor = true
+      if (currentChar.actions >= 2) {
+        currentChar.actions -= 2
+        quest.current = Utils.chooseRandom(Quests[quest.difficulty])()
       }
     } else if (actionId === ACTIONS.ENDGO) {
       state.currentChar ++
@@ -84,10 +85,10 @@ export const runLogicHook = (actionId, event, state = getState()) => {
       let quest = state.npcs[state.speech.npcIndex].quest
       const char = state.chars[state.currentChar]
       char.stars += quest.reward
-      quest.complete = true
+      delete state.npcs[state.speech.npcIndex].quest
     } else if (actionId === ACTIONS.ANSWER_QUESTION_WRONG) {
       let quest = state.npcs[state.speech.npcIndex].quest
-      quest.reward = Math.max(1, quest.reward-1)
+      delete quest.current
     }
 
     moveCameraToPos(state.camera, state.chars[state.currentChar].pos)
